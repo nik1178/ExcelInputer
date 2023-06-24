@@ -2,9 +2,9 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-public class AddButton extends JButton implements ActionListener {
+public class SaveButton extends JButton implements ActionListener {
     MainFrame frame;
-    AddButton(String text, MainFrame frame) {
+    SaveButton(String text, MainFrame frame) {
         super(text);
         this.frame = frame;
         this.addActionListener(this);
