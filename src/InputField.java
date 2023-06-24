@@ -3,6 +3,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+// JPanel that has both a JLabel and JTextField, so that it is easier to organize
 public class InputField extends JPanel{
     String text;
     JLabel label;

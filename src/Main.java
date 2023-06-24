@@ -33,32 +33,5 @@ public class Main {
 
         // Make JFrame
         this.frame = new MainFrame(this);
-        this.readExcelData();
-    }
-
-    public void readExcelData() {
-        Iterator<Row> rowIterator = this.sheet.iterator();
-        while (rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            Cell firstCell = row.getCell(0);
-
-            if (firstCell == null) {
-                System.out.println("Cell 0 is null.");
-                continue;
-            }
-
-            switch (firstCell.getCellType()) {  
-                case Cell.CELL_TYPE_STRING:    //field that represents string cell type  
-                    this.frame.comboBox.addValue(firstCell.getStringCellValue(), row);  
-                    break;  
-                case Cell.CELL_TYPE_NUMERIC:    //field that represents number cell type  
-                    this.frame.comboBox.addValue(String.valueOf(firstCell.getNumericCellValue()), row); 
-                    break;  
-                default:  
-                    System.out.println("Invalid input in cell 0.");
-            }  
-
-            row.getCell(0).setCellValue("test");
-        }
     }
 } 

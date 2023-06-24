@@ -11,7 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 public class MainFrame extends JFrame implements EventListener{
     Main mainClass;
 
-    public ComboExcel<Row> comboBox = new ComboExcel<>();
+    public ComboExcel<ArrayList<String>> comboBox = new ComboExcel<>(this);
     ArrayList<InputField> inputFields = new ArrayList<>();
     AddButton addButton;
     SaveButton saveButton;
@@ -21,9 +21,11 @@ public class MainFrame extends JFrame implements EventListener{
         super();
         this.mainClass = mainClass;
         setupFrame();
+        readExcelData();
         this.setVisible(true);
     }
 
+    // Setup the basic components in the JFrame
     void setupFrame() {
         // Set JFrame properties
         this.setTitle("Podatki");
@@ -50,16 +52,28 @@ public class MainFrame extends JFrame implements EventListener{
         controlPanel.add(this.addButton);
         this.add(controlPanel);
 
+        // Detects when a component has been changed. Used for resizing the components
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
                 adjustTextSize();
+                adjustInputFieldSize();
             }
         });
 
         this.pack();
     }
 
+    // On program start, get all the data from the Excel File and save it in the comboBox.
+    public void readExcelData() {
+        Iterator<Row> rowIterator = this.mainClass.sheet.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            addValueToCombo(rowToStringList(row));
+        }
+    }
+
+    // When window is resized, components will change and calculate new font size based on window width. Currently based on nothing
     public void adjustTextSize() {
         //Make text adjust to window size
         int newFontSize = (int) (this.getWidth() * 0.05);
@@ -73,19 +87,66 @@ public class MainFrame extends JFrame implements EventListener{
         this.saveButton.setFont(this.font);
     }
 
-    public void addValue(String name, String amount, String price) {
-        // Add value to combo box
-        Row row = mainClass.sheet.createRow(mainClass.sheet.getLastRowNum()+(this.mainClass.emptyFile ? 0 : 1));
-        Cell cell = row.createCell(0);
-        cell.setCellValue(name);
-        cell = row.createCell(1);
-        cell.setCellValue(amount);
-        cell = row.createCell(2);
-        cell.setCellValue(price);
-        this.comboBox.addValue(name, row);
+    // When window is resized, components will change and calculate new input field size based on window width. Currently based on nothing
+    public void adjustInputFieldSize() {
+        //Make input fields adjust to window size
+        int newInputFieldWidth = (int) (this.getWidth() * 0.6);
+        for (InputField inputField : this.inputFields) {
+            inputField.textField.setPreferredSize(new Dimension(newInputFieldWidth, newInputFieldWidth / 7));
+        }
+    }
+
+    public void addValue(ArrayList<String> values) {
+        if (values == null) {
+            return;
+        }
+        addValueToCombo(values);
+        saveValues(values, -1);
+        saveExcelFile();
+    }
+    public void addValue(ArrayList<String> values, int index) {
+        if (values == null) {
+            return;
+        }
+        editValueInCombo(values, index);
+        saveValues(values, index);
         saveExcelFile();
     }
 
+    // Index -1 means add to the end of the file
+    public void saveValues(ArrayList<String> values, int index) {
+        if (index == -1) {
+            index = mainClass.sheet.getLastRowNum()+(this.mainClass.emptyFile ? 0 : 1);
+        }
+        Row row = mainClass.sheet.createRow(index);
+        for (int i = 0; i < values.size(); i++) {
+            Cell cell = row.createCell(i);
+            cell.setCellValue(values.get(i));
+        }
+    }
+
+    // When add button is pressed, add the values from the input fields to the comboBox
+    public void addValueToCombo(ArrayList<String> values) {
+        // Add value to combo box
+        this.comboBox.addValue(getDisplayName(values), values);
+        saveExcelFile();
+    }
+
+    // When save button is pressed, save the values from the input fields to the comboBox in the currently selected combobox field
+    public void editValueInCombo(ArrayList<String> values, int index) {
+        this.comboBox.editValue(getDisplayName(values), values, index);
+        saveExcelFile();
+    }
+
+    public String getDisplayName (ArrayList<String> values) {
+        String displayName = "";
+        for (String value : values) {
+            displayName += value + " ";
+        }
+        return displayName;
+    }
+
+    // Whenever something is changed in the combobox, print the workboox to the excel file, so it has latest data
     public boolean saveExcelFile() {
         this.mainClass.emptyFile=false;
         try {
@@ -98,4 +159,44 @@ public class MainFrame extends JFrame implements EventListener{
             return false;
         }
     }
+
+    // Converts a row Objec to an ArrayList<String> where each cell in the row is one value in the list
+    public ArrayList<String> rowToStringList(Row row) {
+        ArrayList<String> values = new ArrayList<>();
+
+        for (int i = 0; i < row.getLastCellNum(); i++) {
+            Cell cell = row.getCell(i);
+            if (cell == null) {
+                System.out.println("Cell "+i+" is null.");
+                continue;
+            }
+
+            String displayValue = "";
+            switch (cell.getCellType()) {  
+                case Cell.CELL_TYPE_STRING:    //field that represents string cell type  
+                    displayValue = cell.getStringCellValue();
+                    break;  
+                case Cell.CELL_TYPE_NUMERIC:    //field that represents number cell type  
+                    displayValue = String.valueOf(cell.getNumericCellValue());
+                    break;  
+                default:  
+                    System.out.println("Invalid input in cell "+i+".");
+            }  
+            values.add(displayValue);
+        } 
+
+        return values;
+    }
+
+    // When a value is selected in the combobox, fill the input fields with the values from the selected item
+    public void updateInputFields(int index) {
+        if (index == -1) {
+            return;
+        }
+        ArrayList<String> values = this.comboBox.getValues(index);
+        for (int i = 0; i < values.size(); i++) {
+            this.inputFields.get(i).textField.setText(values.get(i));
+        }
+    }
+
 }

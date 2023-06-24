@@ -2,6 +2,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
+// Literally the save button
 public class SaveButton extends JButton implements ActionListener {
     MainFrame frame;
     SaveButton(String text, MainFrame frame) {
@@ -17,7 +18,7 @@ public class SaveButton extends JButton implements ActionListener {
             return;
         }
         
-        this.frame.addValue(values.get(0), values.get(1), values.get(2));
+        this.frame.addValue(values, this.frame.comboBox.getSelectedIndex());
     }
 
     public ArrayList<String> readInputFields() {

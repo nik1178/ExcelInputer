@@ -17,7 +17,7 @@ public class AddButton extends JButton implements ActionListener {
             return;
         }
         
-        this.frame.addValue(values.get(0), values.get(1), values.get(2));
+        this.frame.addValue(values);
     }
 
     public ArrayList<String> readInputFields() {
