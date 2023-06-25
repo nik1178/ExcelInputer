@@ -12,19 +12,21 @@ public class AddButton extends JButton implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        this.frame.showErrorMessage(" ");
         ArrayList<String> values = readInputFields();
         if (values == null) {
             return;
         }
         
         this.frame.addValue(values);
+        this.frame.comboBox.setupSelectedIndex(this.frame.comboBox.getItemCount()-1);
     }
 
     public ArrayList<String> readInputFields() {
         ArrayList<String> values = new ArrayList<>();
         int counter = 0;
         for (InputField inputField : this.frame.inputFields) {
-            String current = inputField.textField.getText();
+            String current = inputField.getInput();
             if (current == null || current.length() == 0) {
                 System.out.println("Empty input field at index "+counter+"!");
                 return null;

@@ -15,6 +15,7 @@ public class MainFrame extends JFrame implements EventListener{
     ArrayList<InputField> inputFields = new ArrayList<>();
     AddButton addButton;
     SaveButton saveButton;
+    JLabel errorLabel = new JLabel();
 
     Font font = new Font("Arial", Font.PLAIN, 20);
     MainFrame(Main mainClass) {
@@ -36,7 +37,7 @@ public class MainFrame extends JFrame implements EventListener{
         // Add 3 input fields
         this.inputFields.add(new InputField("Name", this));
         this.inputFields.add(new InputField("Amount", this));
-        this.inputFields.add(new InputField("Price", this));
+        this.inputFields.add(new InputField("Price", this, InputFieldType.FLOAT));
 
         // Add 2 button
         this.addButton = new AddButton("Add", this);
@@ -51,6 +52,7 @@ public class MainFrame extends JFrame implements EventListener{
         controlPanel.add(this.saveButton);
         controlPanel.add(this.addButton);
         this.add(controlPanel);
+        this.add(errorLabel); showErrorMessage(" ");
 
         // Detects when a component has been changed. Used for resizing the components
         this.addComponentListener(new ComponentAdapter() {
@@ -199,4 +201,7 @@ public class MainFrame extends JFrame implements EventListener{
         }
     }
 
+    public void showErrorMessage(String message) {
+        this.errorLabel.setText(message);
+    }
 }

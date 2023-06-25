@@ -21,7 +21,7 @@ public class ComboExcel<E> extends JComboBox<String> {
     public void actionPerformed(ActionEvent e) {
         System.out.println(this.getSelectedItem());
         System.out.println(this.getSelectedIndex());
-        this.frame.updateInputFields(this.getSelectedIndex());
+        setupSelectedIndex(this.getSelectedIndex());
     }
 
     public E getValues(int index) {
@@ -37,5 +37,10 @@ public class ComboExcel<E> extends JComboBox<String> {
         this.values.set(index, value);
         this.insertItemAt(display, index);
         this.removeItemAt(index+1);
+    }
+
+    public void setupSelectedIndex(int index) {
+        this.setSelectedIndex(index);
+        this.frame.updateInputFields(index);
     }
 }
